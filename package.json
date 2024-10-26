@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "server.js",
-    "dev":"SET NODE_ENV=DEV & nodemon server.js"
+    "start": "index.js",
+    "dev": "SET NODE_ENV=DEV & nodemon index.js"
   },
   "author": "Mubarak Mujawar",
   "license": "ISC",

@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
+import authRouter from "./src/routes/authRoutes.js";
+import adminProductsRouter from "./src/routes/adminRoutes.js";
+
 mongoose
   .connect(
     "mongodb+srv://mmsoftinc:MQ1M9ezzZMpfYKzs@mypowermudgarcluster.xouai.mongodb.net/"
@@ -17,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "http://localhost:5173/",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: [
       "Content-Type",
@@ -31,5 +34,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+app.use("/api/auth", authRouter);
+app.use("/api/admin/products", adminProductsRouter);
 
 app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
