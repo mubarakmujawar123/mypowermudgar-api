@@ -60,6 +60,7 @@ export const loginUser = async (req, res) => {
         id: loggedInUser._id,
         role: loggedInUser.role,
         email: loggedInUser.email,
+        userName: loggedInUser.userName,
       },
       "CLIENT_SECRET_KEY",
       { expiresIn: "60m" }
@@ -73,6 +74,7 @@ export const loginUser = async (req, res) => {
         email: loggedInUser.email,
         role: loggedInUser.role,
         id: loggedInUser._id,
+        userName: loggedInUser.userName,
       },
     });
   } catch (e) {
