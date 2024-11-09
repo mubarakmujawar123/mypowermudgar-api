@@ -4,8 +4,8 @@ import {
   loginUser,
   logoutUser,
   registerUser,
-} from "../controllers/auth/authController.js";
-import successResposne from "../utils/successResponse.js";
+} from "../../controllers/auth/authController.js";
+import successResposne from "../../utils/successResponse.js";
 
 const router = express.Router();
 

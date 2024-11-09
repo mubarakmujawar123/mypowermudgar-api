@@ -1,5 +1,5 @@
 import express from "express";
-import { fetchFilteredProducts } from "../controllers/shop/shopProductCotroller.js";
+import { fetchFilteredProducts } from "../../controllers/shop/shopProductCotroller.js";
 fetchFilteredProducts;
 
 const router = express.Router();

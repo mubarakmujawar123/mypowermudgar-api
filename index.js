@@ -3,9 +3,11 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import authRouter from "./src/routes/authRoutes.js";
-import adminProductsRouter from "./src/routes/adminRoutes.js";
-import shopProductsRouter from "./src/routes/shopRoutes.js";
+import authRouter from "./src/routes/auth/authRoutes.js";
+import adminProductsRouter from "./src/routes/admin/adminRoutes.js";
+import shopProductsRouter from "./src/routes/shop/shopRoutes.js";
+import shopCartRouter from "./src/routes/shop/cartRoutes.js";
+import shopAddressRouter from "./src/routes/shop/addressRouter.js";
 
 mongoose
   .connect(
@@ -38,5 +40,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/shop/products", shopProductsRouter);
+app.use("/api/shop/cart", shopCartRouter);
+app.use("/api/shop/address", shopAddressRouter);
 
 app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
