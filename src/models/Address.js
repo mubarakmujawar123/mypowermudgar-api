@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const AddressSchema = new mongoose.Schema(
   {
@@ -10,6 +10,7 @@ const AddressSchema = new mongoose.Schema(
     phone: String,
     country: String,
     notes: String,
+    // isDefault: Schema.Types.Boolean,
   },
   { timestamps: true }
 );

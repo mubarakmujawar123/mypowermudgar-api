@@ -4,8 +4,17 @@ import successResposne from "../../utils/successResponse.js";
 
 export const addAddress = async (req, res) => {
   try {
-    const { userId, address, city, state, pincode, phone, country, notes } =
-      req.body;
+    const {
+      userId,
+      address,
+      city,
+      state,
+      pincode,
+      phone,
+      country,
+      notes,
+      // isDefault,
+    } = req.body;
     console.log(req.body);
     if (
       !userId ||
@@ -31,6 +40,7 @@ export const addAddress = async (req, res) => {
       phone,
       country,
       notes,
+      // isDefault,
     });
     await newAddress.save();
     return successResposne({
