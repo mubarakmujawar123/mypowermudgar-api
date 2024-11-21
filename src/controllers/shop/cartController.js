@@ -3,10 +3,12 @@ import Product from "../../models/Product.js";
 
 import errorResposne from "../../utils/errorResponse.js";
 import successResposne from "../../utils/successResponse.js";
+import { calculateItemPrice } from "../../utils/utils.js";
 
 export const addToCart = async (req, res) => {
   try {
-    const { userId, productId, quantity, productDescription } = req.body;
+    const { userId, productId, quantity, productDescription, basePrice } =
+      req.body;
     if (!userId || !productId || quantity <= 0) {
       return errorResposne({
         res,
@@ -36,9 +38,19 @@ export const addToCart = async (req, res) => {
       );
     });
     if (currentProductIndex === -1) {
-      cart.items.push({ productId, quantity, productDescription });
+      cart.items.push({
+        productId,
+        quantity,
+        productDescription,
+        price: calculateItemPrice(basePrice, quantity, productDescription),
+      });
     } else {
       cart.items[currentProductIndex].quantity += quantity;
+      cart.items[currentProductIndex].price = calculateItemPrice(
+        basePrice,
+        cart.items[currentProductIndex].quantity,
+        productDescription
+      );
     }
     await cart.save();
 

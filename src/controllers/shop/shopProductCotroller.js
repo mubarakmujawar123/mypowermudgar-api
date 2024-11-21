@@ -5,8 +5,9 @@ import successResposne from "../../utils/successResponse.js";
 export const fetchFilteredProducts = async (req, res) => {
   const { category = [] } = req.query;
   let filters = {};
-  if (category.length) {
-    filters.category = { $in: category.split(",") };
+  const _category = category === "all-products" ? "" : category;
+  if (_category.length) {
+    filters.category = { $in: _category.split(",") };
   }
 
   try {

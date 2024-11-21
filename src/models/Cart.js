@@ -19,6 +19,7 @@ const CartSchema = new mongoose.Schema(
           required: true,
           min: 1,
         },
+        price: Number,
         productDescription: {
           type: Schema.Types.Mixed,
         },

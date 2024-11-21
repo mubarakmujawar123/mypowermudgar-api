@@ -7,6 +7,7 @@ import Order from "../../models/Order.js";
 import Product from "../../models/Product.js";
 import errorResposne from "../../utils/errorResponse.js";
 import successResposne from "../../utils/successResponse.js";
+import { calculateItemPrice } from "../../utils/utils.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -21,31 +22,39 @@ export const createOrder = async (req, res) => {
       orderDate,
       orderUpdateDate,
       paymentId,
+      shippingCost,
       payerId,
       cartId,
     } = req.body;
 
+    console.log("cartItems", cartItems);
+
     const cartItemsDetails = cartItems.map((item) => ({
       name: item.title,
       sku: item.productId,
-      description: `Category- ${item.category}, Product description = ${item.productDescription}`,
+      description: `Category -${
+        item.category
+      }, product description - ${JSON.stringify(item.productDescription)} \n`,
       unit_amount: {
         currency_code: "USD",
-        value: item.price.toFixed(2),
+        value: `${calculateItemPrice(item.price, 1, item.productDescription)}`,
       },
-      quantity: item.quantity,
+      quantity: `${item.quantity}`,
     }));
     const totalAmountDetails = {
       currency_code: "USD",
-      value: totalAmount.toFixed(2),
+      value: `${(parseInt(totalAmount) + parseInt(shippingCost)).toFixed(2)}`,
       breakdown: {
         item_total: {
           currency_code: "USD",
-          value: totalAmount.toFixed(2),
+          value: `${totalAmount.toFixed(2)}`,
+        },
+        shipping: {
+          currency_code: "USD",
+          value: `${shippingCost.toFixed(2)}`,
         },
       },
     };
-
     const response = await createOrderPayPal(
       cartItemsDetails,
       totalAmountDetails
@@ -67,6 +76,7 @@ export const createOrder = async (req, res) => {
       paymentMethod,
       paymentStatus: response?.data?.status,
       totalAmount,
+      shippingCost,
       orderDate,
       orderUpdateDate,
       paymentId: response?.data?.id,
@@ -152,7 +162,7 @@ export const getAllOrderByUser = async (req, res) => {
     const { userId } = req.params;
     console.log("getAllOrderByUser userID", userId);
 
-    let orders = await Order.find({ userId });
+    let orders = await Order.find({ userId })?.sort({ orderDate: -1 });
     if (!orders) {
       return errorResposne({
         res,
