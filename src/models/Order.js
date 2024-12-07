@@ -11,7 +11,7 @@ const OrderSchema = new mongoose.Schema({
       price: String,
       quantity: Number,
       category: String,
-      productDescription: {
+      productAdditionalInfo: {
         type: Schema.Types.Mixed,
       },
     },
@@ -27,6 +27,8 @@ const OrderSchema = new mongoose.Schema({
     notes: String,
   },
   orderStatus: String,
+  orderInCurrency: String,
+  orderInCurrencyRate: Number,
   paymentMethod: String,
   paymentStatus: String,
   totalAmount: Number,

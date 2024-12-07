@@ -5,8 +5,7 @@ import successResposne from "../../utils/successResponse.js";
 import errorResposne from "../../utils/errorResponse.js";
 
 export const registerUser = async (req, res) => {
-  const { userName, email, password } = req.body;
-  console.log("userName", userName, email, password);
+  const { userName, email, password, preferredCurrency } = req.body;
   try {
     const findUser = await User.findOne({ email });
     console.log("finduser", findUser);
@@ -19,12 +18,40 @@ export const registerUser = async (req, res) => {
       });
     }
     const hashPassword = await bcrypt.hash(password, 12);
-    const newUser = new User({ userName, email, password: hashPassword });
+    const newUser = new User({
+      userName,
+      email,
+      password: hashPassword,
+    });
     await newUser.save();
     successResposne({
       res,
       statusCode: 200,
-      message: "Registration successful",
+      message: "Registration successful!",
+    });
+  } catch (e) {
+    console.log(e);
+    errorResposne({ res, statusCode: 500, message: "Some error occured!" });
+  }
+};
+
+export const editPreference = async (req, res) => {
+  const { id } = req.params;
+  const { preferredCurrency } = req.body;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return errorResposne({
+        res,
+        statusCode: 404,
+        message: "User not found!.",
+      });
+    }
+    await User.findByIdAndUpdate(id, { preferredCurrency });
+    successResposne({
+      res,
+      statusCode: 201,
+      message: "Preference updated successfully!",
     });
   } catch (e) {
     console.log(e);
@@ -61,6 +88,7 @@ export const loginUser = async (req, res) => {
         role: loggedInUser.role,
         email: loggedInUser.email,
         userName: loggedInUser.userName,
+        preferredCurrency: loggedInUser.preferredCurrency,
       },
       "CLIENT_SECRET_KEY",
       { expiresIn: "60m" }
@@ -75,6 +103,7 @@ export const loginUser = async (req, res) => {
         role: loggedInUser.role,
         id: loggedInUser._id,
         userName: loggedInUser.userName,
+        preferredCurrency: loggedInUser.preferredCurrency,
       },
     });
   } catch (e) {
@@ -103,7 +132,13 @@ export const authMiddleware = async (req, res, next) => {
   }
   try {
     const decodedToken = jwt.verify(token, "CLIENT_SECRET_KEY");
-    req.user = decodedToken;
+    console.log("decodedToken", decodedToken);
+    const email = decodedToken.email;
+    const loggedInUser = await User.findOne({ email });
+    req.user = {
+      ...decodedToken,
+      preferredCurrency: loggedInUser.preferredCurrency,
+    };
     next();
   } catch (e) {
     console.log(e);

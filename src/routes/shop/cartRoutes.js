@@ -10,6 +10,6 @@ const router = express.Router();
 router.post("/add", addToCart);
 router.get("/get/:userId", fetchCartItems);
 router.put("/update-cart", updateCartItemQuantity);
-router.delete("/:userId/:productId/:productDescription", deleteCartItem);
+router.delete("/:userId/:productId/:productAdditionalInfo", deleteCartItem);
 
 export default router;

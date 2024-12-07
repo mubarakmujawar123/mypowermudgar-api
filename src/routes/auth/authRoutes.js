@@ -1,6 +1,7 @@
 import * as express from "express";
 import {
   authMiddleware,
+  editPreference,
   loginUser,
   logoutUser,
   registerUser,
@@ -10,6 +11,7 @@ import successResposne from "../../utils/successResponse.js";
 const router = express.Router();
 
 router.post("/register", registerUser);
+router.put("/editPreference/:id", editPreference);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.get("/checkAuth", authMiddleware, (req, res) => {

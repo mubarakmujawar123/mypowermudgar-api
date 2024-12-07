@@ -1,14 +1,26 @@
-export const calculateItemPrice = (basePrice, quantity, productDescription) => {
-  let finalPrice = basePrice * parseInt(quantity);
+export const calculateItemPrice = (
+  basePrice,
+  quantity,
+  productAdditionalInfo
+) => {
+  let finalPrice = basePrice * Number(quantity);
 
-  let productWeight = productDescription.weight;
+  let productWeight = productAdditionalInfo?.weight;
   if (productWeight) {
     if (productWeight.includes("-")) {
       productWeight = productWeight.split("-")?.[0];
     }
 
-    finalPrice = finalPrice * parseInt(productWeight);
+    finalPrice = finalPrice * Number(productWeight);
   }
   finalPrice = finalPrice.toFixed(2);
   return finalPrice;
+};
+
+export const convertPrice = (price, currancyRate) => {
+  let calculatePrice = price;
+  if (currancyRate) {
+    calculatePrice = Number(price) * Number(currancyRate);
+  }
+  return Number(calculatePrice).toFixed(2);
 };

@@ -7,7 +7,7 @@ import { calculateItemPrice } from "../../utils/utils.js";
 
 export const addToCart = async (req, res) => {
   try {
-    const { userId, productId, quantity, productDescription, basePrice } =
+    const { userId, productId, quantity, productAdditionalInfo, basePrice } =
       req.body;
     if (!userId || !productId || quantity <= 0) {
       return errorResposne({
@@ -33,23 +33,23 @@ export const addToCart = async (req, res) => {
     const currentProductIndex = cart.items.findIndex((item) => {
       return (
         item.productId.toString() === productId &&
-        JSON.stringify(item.productDescription) ===
-          JSON.stringify(productDescription)
+        JSON.stringify(item.productAdditionalInfo) ===
+          JSON.stringify(productAdditionalInfo)
       );
     });
     if (currentProductIndex === -1) {
       cart.items.push({
         productId,
         quantity,
-        productDescription,
-        price: calculateItemPrice(basePrice, quantity, productDescription),
+        productAdditionalInfo,
+        price: calculateItemPrice(basePrice, quantity, productAdditionalInfo),
       });
     } else {
       cart.items[currentProductIndex].quantity += quantity;
       cart.items[currentProductIndex].price = calculateItemPrice(
         basePrice,
         cart.items[currentProductIndex].quantity,
-        productDescription
+        productAdditionalInfo
       );
     }
     await cart.save();
@@ -105,7 +105,7 @@ export const fetchCartItems = async (req, res) => {
       price: item.productId.price,
       salePrice: item.productId.salePrice,
       quantity: item.quantity,
-      productDescription: item.productDescription,
+      productAdditionalInfo: item.productAdditionalInfo,
     }));
 
     return successResposne({
@@ -125,7 +125,7 @@ export const fetchCartItems = async (req, res) => {
 
 export const updateCartItemQuantity = async (req, res) => {
   try {
-    const { userId, productId, quantity, productDescription } = req.body;
+    const { userId, productId, quantity, productAdditionalInfo } = req.body;
     if (!userId || !productId || quantity <= 0) {
       return errorResposne({
         res,
@@ -144,8 +144,8 @@ export const updateCartItemQuantity = async (req, res) => {
     const currentProductIndex = cart.items.findIndex((item) => {
       return (
         item.productId.toString() === productId &&
-        JSON.stringify(item.productDescription) ===
-          JSON.stringify(productDescription)
+        JSON.stringify(item.productAdditionalInfo) ===
+          JSON.stringify(productAdditionalInfo)
       );
     });
     if (currentProductIndex === -1) {
@@ -171,7 +171,7 @@ export const updateCartItemQuantity = async (req, res) => {
       price: item.productId ? item.productId.price : null,
       salePrice: item.productId ? item.productId.salePrice : null,
       quantity: item.quantity,
-      productDescription: item.productDescription,
+      productAdditionalInfo: item.productAdditionalInfo,
     }));
     return successResposne({
       res,
@@ -190,8 +190,8 @@ export const updateCartItemQuantity = async (req, res) => {
 
 export const deleteCartItem = async (req, res) => {
   try {
-    let { userId, productId, productDescription } = req.params;
-    productDescription = JSON.parse(productDescription);
+    let { userId, productId, productAdditionalInfo } = req.params;
+    productAdditionalInfo = JSON.parse(productAdditionalInfo);
     if (!userId || !productId) {
       return errorResposne({
         res,
@@ -213,8 +213,8 @@ export const deleteCartItem = async (req, res) => {
     cart.items = cart.items.filter(
       (item) =>
         item.productId._id.toString() !== productId ||
-        JSON.stringify(item.productDescription) !==
-          JSON.stringify(productDescription)
+        JSON.stringify(item.productAdditionalInfo) !==
+          JSON.stringify(productAdditionalInfo)
     );
 
     await cart.save();
@@ -232,7 +232,7 @@ export const deleteCartItem = async (req, res) => {
       price: item.productId ? item.productId.price : null,
       salePrice: item.productId ? item.productId.salePrice : null,
       quantity: item.quantity,
-      productDescription: item.productDescription,
+      productAdditionalInfo: item.productAdditionalInfo,
     }));
     return successResposne({
       res,

@@ -7,7 +7,7 @@ import Order from "../../models/Order.js";
 import Product from "../../models/Product.js";
 import errorResposne from "../../utils/errorResponse.js";
 import successResposne from "../../utils/successResponse.js";
-import { calculateItemPrice } from "../../utils/utils.js";
+import { calculateItemPrice, convertPrice } from "../../utils/utils.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -21,37 +21,59 @@ export const createOrder = async (req, res) => {
       totalAmount,
       orderDate,
       orderUpdateDate,
+      infoForPayPal,
+      orderInCurrency,
+      orderInCurrencyRate,
       paymentId,
       shippingCost,
       payerId,
       cartId,
     } = req.body;
 
+    console.log("orderInCurrencyRate", orderInCurrencyRate);
     console.log("cartItems", cartItems);
 
     const cartItemsDetails = cartItems.map((item) => ({
       name: item.title,
       sku: item.productId,
-      description: `Category -${
-        item.category
-      }, product description - ${JSON.stringify(item.productDescription)} \n`,
+      // description: `Category -${
+      //   item.category
+      // }, product description - ${JSON.stringify(item.productAdditionalInfo)} \n`,
       unit_amount: {
-        currency_code: "USD",
-        value: `${calculateItemPrice(item.price, 1, item.productDescription)}`,
+        currency_code: infoForPayPal?.currencyForCheckout,
+        value: `${Number(
+          convertPrice(
+            calculateItemPrice(item.price, 1, item.productAdditionalInfo),
+            infoForPayPal.currencyRateForCheckout
+          )
+        ).toFixed(2)}`,
       },
       quantity: `${item.quantity}`,
     }));
     const totalAmountDetails = {
-      currency_code: "USD",
-      value: `${(parseInt(totalAmount) + parseInt(shippingCost)).toFixed(2)}`,
+      currency_code: infoForPayPal?.currencyForCheckout,
+      value: `${Number(
+        Number(
+          convertPrice(totalAmount, infoForPayPal.currencyRateForCheckout)
+        ) +
+          Number(
+            convertPrice(shippingCost, infoForPayPal.currencyRateForCheckout)
+          )
+      ).toFixed(2)}`,
       breakdown: {
         item_total: {
-          currency_code: "USD",
-          value: `${totalAmount.toFixed(2)}`,
+          currency_code: infoForPayPal?.currencyForCheckout,
+          value: `${convertPrice(
+            totalAmount,
+            infoForPayPal.currencyRateForCheckout
+          )}`,
         },
         shipping: {
-          currency_code: "USD",
-          value: `${shippingCost.toFixed(2)}`,
+          currency_code: infoForPayPal?.currencyForCheckout,
+          value: `${convertPrice(
+            shippingCost,
+            infoForPayPal.currencyRateForCheckout
+          )}`,
         },
       },
     };
@@ -60,6 +82,8 @@ export const createOrder = async (req, res) => {
       totalAmountDetails
     );
 
+    console.log("response order controller", response);
+
     if (response.status === "error") {
       return errorResposne({
         res,
@@ -67,6 +91,11 @@ export const createOrder = async (req, res) => {
         message: "Error while creating paypal payment",
       });
     }
+
+    const approvalURL = response.data.links.find(
+      (link) => link.rel === "approve"
+    ).href;
+
     const newlyCreatedOrder = new Order({
       userId,
       cartId,
@@ -77,6 +106,8 @@ export const createOrder = async (req, res) => {
       paymentStatus: response?.data?.status,
       totalAmount,
       shippingCost,
+      orderInCurrency: orderInCurrency,
+      orderInCurrencyRate: orderInCurrencyRate,
       orderDate,
       orderUpdateDate,
       paymentId: response?.data?.id,
@@ -84,9 +115,7 @@ export const createOrder = async (req, res) => {
     });
 
     await newlyCreatedOrder.save();
-    const approvalURL = response.data.links.find(
-      (link) => link.rel === "approve"
-    ).href;
+
     return successResposne({
       res,
       statusCode: 200,
