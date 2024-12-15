@@ -18,9 +18,7 @@ if (process.env.NODE_ENV === "dev") {
 }
 
 mongoose
-  .connect(
-    "mongodb+srv://mmsoftinc:MQ1M9ezzZMpfYKzs@mypowermudgarcluster.xouai.mongodb.net/"
-  )
+  .connect(process.env.MONGO_DB_URL)
   .then(() => {
     console.log("DB connected");
   })
