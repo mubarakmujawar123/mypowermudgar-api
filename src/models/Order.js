@@ -37,6 +37,8 @@ const OrderSchema = new mongoose.Schema({
   orderUpdateDate: Date,
   paymentId: String,
   payerId: String,
+  logisticsCompany: String,
+  consignmentNumber: String,
 });
 
 export default mongoose.model("Order", OrderSchema);

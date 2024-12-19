@@ -13,7 +13,7 @@ export const sendMail = async ({ userName, to, subject, message }) => {
     from: `"MyPowerMudgar " <${process.env.DOMAIN_EMAIL}>`, // Sender address
     //to: to, // List of recipients
     to: process.env.DOMAIN_EMAIL, // remove this
-    subject: subject, // Subject line
+    subject: `MyPowerMudgar | ${subject}`, // Subject line
     html: `Hello ${userName}, <br/> ${message} <br/><br/> Regards, <br/> <b>MypowerMudgar Team</>`, // HTML body
   };
 
@@ -23,6 +23,7 @@ export const sendMail = async ({ userName, to, subject, message }) => {
     res = await transporter.sendMail(mailOptions);
   } catch (err) {
     res = { Error: err };
+    console.log("Email error", err);
   }
   return res;
 };

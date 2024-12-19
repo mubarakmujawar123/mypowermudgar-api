@@ -1,3 +1,12 @@
+export const constantMap = {
+  INPROGRESS: "IN PROGRESS",
+  INSHIPPING: "IN SHIPPING",
+};
+
+export const getConstant = (key) => {
+  const constVal = constantMap[key] ?? key;
+  return constVal;
+};
 export const currencySymbol = {
   AED: "د.إ",
   AFN: "؋",

@@ -6,10 +6,12 @@ import dotenv from "dotenv";
 import authRouter from "./src/routes/auth/authRoutes.js";
 import adminProductsRouter from "./src/routes/admin/adminProductRoutes.js";
 import adminOrdersRouter from "./src/routes/admin/adminOrdersRouter.js";
+import adminDashbordRouter from "./src/routes/admin/adminDashbordRouter.js";
 import shopProductsRouter from "./src/routes/shop/shopRoutes.js";
 import shopCartRouter from "./src/routes/shop/cartRoutes.js";
 import shopAddressRouter from "./src/routes/shop/addressRouter.js";
 import shopOrderRouter from "./src/routes/shop/orderRoutes.js";
+import currencyRouter from "./src/routes/currency/currencyRouter.js";
 
 if (process.env.NODE_ENV === "dev") {
   dotenv.config({ path: `.env` });
@@ -46,9 +48,11 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrdersRouter);
+app.use("/api/admin/dashbord", adminDashbordRouter);
 app.use("/api/shop/products", shopProductsRouter);
 app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
+app.use("/api/currency", currencyRouter);
 
 app.listen(PORT, () => console.log(`server is running on port ${PORT}`));

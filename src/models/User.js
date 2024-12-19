@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     preferredCurrency: {
       type: String,
-      required: true,
+      // required: true,
       default: "INR",
     },
     role: {

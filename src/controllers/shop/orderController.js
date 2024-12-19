@@ -32,9 +32,8 @@ export const createOrder = async (req, res) => {
       payerId,
       cartId,
     } = req.body;
-
-    console.log("orderInCurrencyRate", orderInCurrencyRate);
-    console.log("cartItems", cartItems);
+    const consignmentNumber = "";
+    const logisticsCompany = "";
 
     const cartItemsDetails = cartItems.map((item) => ({
       name: item.title,
@@ -115,6 +114,8 @@ export const createOrder = async (req, res) => {
       orderUpdateDate,
       paymentId: response?.data?.id,
       payerId,
+      consignmentNumber,
+      logisticsCompany,
     });
 
     await newlyCreatedOrder.save();

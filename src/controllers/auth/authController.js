@@ -14,13 +14,22 @@ const generateOTP = () => {
 };
 
 export const registerUser = async (req, res) => {
-  const { userName, email, password, preferredCurrency } = req.body;
+  let { userName, email, password } = req.body;
+
   try {
+    if (!userName || !email || !password) {
+      return errorResposne({
+        res,
+        statusCode: 400,
+        message: "User Name, Password and Email required!",
+      });
+    }
+    email = email.toLowerCase();
     const findUser = await User.findOne({ email });
     if (findUser) {
       return errorResposne({
         res,
-        statusCode: 200,
+        statusCode: 400,
         message:
           "User already present for this email id. Please try with another email Id.",
       });
@@ -33,12 +42,11 @@ export const registerUser = async (req, res) => {
       userName,
       email,
       password: hashPassword,
-      preferredCurrency,
       emailVerificationOTP,
       emailVerificationOTPExpires,
     });
     await newUser.save();
-    const subject = `MyPowerMudgar | Email verification | OTP`;
+    const subject = `Email verification | OTP`;
     const message = `Welcome to MyPowerMudgar e-Store. <br/> Your Email verification OTP is <h2>${emailVerificationOTP}</h2> OTP valid for 30 min. `;
 
     const emailResp = await sendMail({
@@ -182,7 +190,7 @@ export const updatePassword = async (req, res) => {
     const hashPassword = await bcrypt.hash(newPassword, 12);
     user.password = hashPassword;
     await user.save();
-    const subject = `MyPowerMudgar | Password Reset`;
+    const subject = `Password Reset`;
     const message = `Your password has been reset. <br/> Please login with new password. `;
 
     const emailResp = await sendMail({
@@ -232,7 +240,7 @@ export const resendOTP = async (req, res) => {
     }
     const emailVerificationOTP = generateOTP();
     const emailVerificationOTPExpires = Date.now() + 30 * 60 * 1000; // 30 min otp expires time form current time
-    const subject = `MyPowerMudgar | Resend | OTP`;
+    const subject = `Resend | OTP`;
     const message = `New OTP for your Email verification is <h2>${emailVerificationOTP}</h2> OTP valid for 30 min. `;
 
     const emailResp = await sendMail({
@@ -285,7 +293,7 @@ export const resetPasswordOTPGenerate = async (req, res) => {
     }
     const _resetPasswordOTP = generateOTP();
     const _resetPasswordOTPExpires = Date.now() + 5 * 60 * 1000; // 5 min otp expires time form current time
-    const subject = `MyPowerMudgar | Reset Password | OTP`;
+    const subject = `Reset Password | OTP`;
     const message = `OTP to reset your password is <h2>${_resetPasswordOTP}</h2> OTP valid for 5 min. `;
 
     const emailResp = await sendMail({
@@ -355,7 +363,7 @@ export const loginUser = async (req, res) => {
     if (!loggedInUser.isVerified) {
       const emailVerificationOTP = generateOTP();
       const emailVerificationOTPExpires = Date.now() + 30 * 60 * 1000; // 30 min otp expires time form current time
-      const subject = `MyPowerMudgar | Email verification | OTP`;
+      const subject = `Email verification | OTP`;
       const message = `Welcome to MyPowerMudgar e-Store. <br/> Your Email verification OTP is <h2>${emailVerificationOTP}</h2> OTP valid for 30 min. `;
 
       const emailResp = await sendMail({
@@ -404,7 +412,7 @@ export const loginUser = async (req, res) => {
         preferredCurrency: loggedInUser.preferredCurrency,
       },
       "CLIENT_SECRET_KEY",
-      { expiresIn: "60m" }
+      { expiresIn: "24h" }
     );
     res.cookie("token", token, { httpOnly: true, secure: false });
     /* sendMail({

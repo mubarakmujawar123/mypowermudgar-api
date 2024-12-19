@@ -1,4 +1,7 @@
+import { sendMail } from "../../helpers/emailConfiguration.js";
 import Order from "../../models/Order.js";
+import User from "../../models/User.js";
+import { getConstant } from "../../utils/constant.js";
 import errorResposne from "../../utils/errorResponse.js";
 import successResposne from "../../utils/successResponse.js";
 
@@ -52,7 +55,7 @@ export const getOrderDetailsForAdmin = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { orderStatus } = req.body;
+    const { orderStatus, consignmentNumber, logisticsCompany } = req.body;
     const order = await Order.findById(id);
     if (!order) {
       return errorResposne({
@@ -61,8 +64,43 @@ export const updateOrderStatus = async (req, res) => {
         message: "No order found!",
       });
     }
-    await Order.findByIdAndUpdate(id, { orderStatus });
+    await Order.findByIdAndUpdate(id, {
+      orderStatus,
+      consignmentNumber,
+      logisticsCompany,
+    });
 
+    const loggedInUser = await User.findById(order.userId);
+    if (!loggedInUser) {
+      return errorResposne({
+        res,
+        statusCode: 404,
+        message: "User not found!",
+      });
+    }
+
+    sendMail({
+      userName: loggedInUser.userName,
+      to: loggedInUser.email,
+      subject: `Order Status Updated | ${getConstant(orderStatus)}`,
+      message: `Your order status has been updated.<br/> <br/> <b>Order No. : </b> ${id}
+                 <br/><br/>
+                 <b>Order Status :</b>  ${getConstant(orderStatus)}
+                 <br/><br/>
+                 ${
+                   consignmentNumber
+                     ? `<b>Consignment Number :</b>  ${consignmentNumber}`
+                     : ""
+                 }
+                   ${
+                     logisticsCompany
+                       ? `<br/<br/><b>Logistics Company :</b> ${logisticsCompany}`
+                       : ""
+                   }
+                 `,
+    });
+
+    //send mail to user
     return successResposne({
       res,
       statusCode: 201,
