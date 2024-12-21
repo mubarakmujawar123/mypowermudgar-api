@@ -22,6 +22,7 @@ export const createOrder = async (req, res) => {
       paymentMethod,
       paymentStatus,
       totalAmount,
+      totalCartPriceWithPreferredCurrency,
       orderDate,
       orderUpdateDate,
       infoForPayPal,
@@ -52,23 +53,24 @@ export const createOrder = async (req, res) => {
       },
       quantity: `${item.quantity}`,
     }));
+
+    const totalAmountUsingCartItems = cartItemsDetails
+      .reduce((acc, item) => item.unit_amount.value * item.quantity + acc, 0)
+      .toFixed(2);
+
     const totalAmountDetails = {
       currency_code: infoForPayPal?.currencyForCheckout,
       value: `${Number(
-        Number(
-          convertPrice(totalAmount, infoForPayPal.currencyRateForCheckout)
-        ) +
+        Number(totalAmountUsingCartItems) +
           Number(
             convertPrice(shippingCost, infoForPayPal.currencyRateForCheckout)
           )
       ).toFixed(2)}`,
+
       breakdown: {
         item_total: {
           currency_code: infoForPayPal?.currencyForCheckout,
-          value: `${convertPrice(
-            totalAmount,
-            infoForPayPal.currencyRateForCheckout
-          )}`,
+          value: `${totalAmountUsingCartItems}`,
         },
         shipping: {
           currency_code: infoForPayPal?.currencyForCheckout,
@@ -107,6 +109,7 @@ export const createOrder = async (req, res) => {
       paymentMethod,
       paymentStatus: response?.data?.status,
       totalAmount,
+      totalCartPriceWithPreferredCurrency,
       shippingCost,
       orderInCurrency: orderInCurrency,
       orderInCurrencyRate: orderInCurrencyRate,
@@ -213,6 +216,10 @@ export const capturePayment = async (req, res) => {
         message: "User not found!",
       });
     }
+    const getCartId = order.cartId;
+    await Cart.findByIdAndDelete(getCartId);
+
+    await order.save();
 
     const cartItemsInfo = order?.cartItems?.map((item) => {
       const cartItem = ` 
@@ -251,7 +258,7 @@ export const capturePayment = async (req, res) => {
             ${currencySymbol[order.orderInCurrency]}&nbsp;${Number(
         Number(convertPrice(order.totalAmount, order.orderInCurrencyRate)) +
           Number(convertPrice(order.shippingCost, order.orderInCurrencyRate))
-      ).toFixed(2)}
+      )}
              <br/><br/> <b>Address</b><br/>
             ${getAddress(order.addressInfo)}
 
@@ -259,11 +266,6 @@ export const capturePayment = async (req, res) => {
             <br/><i>Total order amount is based on total products amount and shipping charges</i><br/>
           `,
     });
-
-    const getCartId = order.cartId;
-    await Cart.findByIdAndDelete(getCartId);
-
-    await order.save();
 
     return successResposne({
       res,

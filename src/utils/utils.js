@@ -3,7 +3,7 @@ export const calculateItemPrice = (
   quantity,
   productAdditionalInfo
 ) => {
-  let finalPrice = basePrice * Number(quantity);
+  let finalPrice = Number(basePrice) * Number(quantity);
 
   let productWeight = productAdditionalInfo?.weight;
   if (productWeight) {
@@ -13,7 +13,7 @@ export const calculateItemPrice = (
 
     finalPrice = finalPrice * Number(productWeight);
   }
-  finalPrice = finalPrice.toFixed(2);
+  // finalPrice = finalPrice.toFixed(2);
   return finalPrice;
 };
 

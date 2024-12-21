@@ -1,29 +1,30 @@
 import successResposne from "../../utils/successResponse.js";
 import errorResposne from "../../utils/errorResponse.js";
-import CurrencyRates from "../../models/CurrencyRates.js";
+import ShippingCharges from "../../models/ShippingCharges.js";
 
-export const setCurrencyRates = async (req, res) => {
+export const setShippingCharges = async (req, res) => {
   try {
-    const { rates } = req.body;
-    console.log("Rates", rates);
+    const { charges } = req.body;
+    console.log("charges", charges);
 
-    if (!rates) {
+    if (!charges || (charges && charges?.length == 0)) {
       return errorResposne({
         res,
         statusCode: 400,
-        message: "Currency rates are required!",
+        message: "Shipping Charges are required!",
       });
     }
 
-    await CurrencyRates.findOneAndUpdate(
+    await ShippingCharges.findOneAndUpdate(
       {},
-      { rates: rates },
+      { charges: charges },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+
     successResposne({
       res,
       statusCode: 200,
-      message: "Currencies has been updated!",
+      message: "Shipping Charges has been updated!",
     });
   } catch (e) {
     console.log(e);
@@ -31,21 +32,21 @@ export const setCurrencyRates = async (req, res) => {
   }
 };
 
-export const getCurrencyRates = async (req, res) => {
+export const getShippingCharges = async (req, res) => {
   try {
-    const currencyRatesInfo = await CurrencyRates.find({});
-    if (!currencyRatesInfo) {
+    const _shippingCharges = await ShippingCharges.find({});
+    if (!_shippingCharges) {
       return errorResposne({
         res,
         statusCode: 400,
-        message: "Facing issue to get curreny rates!",
+        message: "Facing issue to get Shipping Charges!",
       });
     }
     successResposne({
       res,
       statusCode: 200,
-      data: currencyRatesInfo[0],
-      message: "Curreny rates fechted successfully!",
+      data: _shippingCharges[0]?.charges,
+      message: "Shipping Charges fechted successfully!",
     });
   } catch (e) {
     console.log(e);

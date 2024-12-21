@@ -32,6 +32,7 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: String,
   paymentStatus: String,
   totalAmount: Number,
+  totalCartPriceWithPreferredCurrency: Number,
   shippingCost: Number,
   orderDate: Date,
   orderUpdateDate: Date,

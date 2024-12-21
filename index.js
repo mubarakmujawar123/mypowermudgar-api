@@ -12,6 +12,7 @@ import shopCartRouter from "./src/routes/shop/cartRoutes.js";
 import shopAddressRouter from "./src/routes/shop/addressRouter.js";
 import shopOrderRouter from "./src/routes/shop/orderRoutes.js";
 import currencyRouter from "./src/routes/currency/currencyRouter.js";
+import shippingChargesRouter from "./src/routes/shippingCharges/shippingChargesRouter.js";
 
 if (process.env.NODE_ENV === "dev") {
   dotenv.config({ path: `.env` });
@@ -54,5 +55,6 @@ app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/currency", currencyRouter);
+app.use("/api/shippingCharges", shippingChargesRouter);
 
 app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
