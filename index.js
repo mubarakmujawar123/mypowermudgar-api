@@ -29,10 +29,10 @@ mongoose
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+console.log("process.env.BASE_URL", process.env.BASE_URL);
 app.use(
   cors({
-    origin: process.env.CLINET_URL,
+    origin: process.env.BASE_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: [
       "Content-Type",
