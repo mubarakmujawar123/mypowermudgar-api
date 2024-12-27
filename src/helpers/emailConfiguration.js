@@ -11,8 +11,8 @@ export const sendMail = async ({ userName, to, subject, message }) => {
   // Email options
   let mailOptions = {
     from: `"MyPowerMudgar " <${process.env.DOMAIN_EMAIL}>`, // Sender address
-    //to: to, // List of recipients
-    to: process.env.DOMAIN_EMAIL, // remove this
+    to: to, // List of recipients
+    // to: process.env.DOMAIN_EMAIL, // remove this
     subject: `MyPowerMudgar | ${subject}`, // Subject line
     html: `Hello ${userName}, <br/> ${message} <br/><br/> Regards, <br/> <b>MypowerMudgar Team</>`, // HTML body
   };

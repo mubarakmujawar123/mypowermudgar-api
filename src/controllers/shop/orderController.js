@@ -245,10 +245,9 @@ export const capturePayment = async (req, res) => {
           <br/><br/> <b>Order Details</b>
             ${cartItemsInfo.join(" ")}
             <br/> <b>Order Price : </b>
-            ${currencySymbol[order.orderInCurrency]}&nbsp;${convertPrice(
-        order.totalAmount,
-        order.orderInCurrencyRate
-      )}
+            ${currencySymbol[order.orderInCurrency]}&nbsp;${
+        order.totalCartPriceWithPreferredCurrency
+      }
             <br/> <b>Shipping Charges : </b>
             ${currencySymbol[order.orderInCurrency]}&nbsp;${convertPrice(
         order.shippingCost,
@@ -256,9 +255,9 @@ export const capturePayment = async (req, res) => {
       )}
             <br/> <b>Total Order Amount : </b>
             ${currencySymbol[order.orderInCurrency]}&nbsp;${Number(
-        Number(convertPrice(order.totalAmount, order.orderInCurrencyRate)) +
+        Number(order.totalCartPriceWithPreferredCurrency) +
           Number(convertPrice(order.shippingCost, order.orderInCurrencyRate))
-      )}
+      ).toFixed(2)}
              <br/><br/> <b>Address</b><br/>
             ${getAddress(order.addressInfo)}
 
