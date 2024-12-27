@@ -59,6 +59,7 @@ export const addProduct = async (req, res) => {
       message: "Product created successfully!",
     });
   } catch (e) {
+    console.log(e);
     errorResposne({ res, statusCode: 500, message: "Something went wrong!" });
   }
 };
@@ -74,6 +75,7 @@ export const fetchAllProducts = async (req, res) => {
       message: "Products fetched successfully!",
     });
   } catch (e) {
+    console.log(e);
     errorResposne({ res, statusCode: 500, message: "Something went wrong!" });
   }
 };

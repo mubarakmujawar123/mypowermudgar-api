@@ -1,7 +1,7 @@
 const errorResposne = ({
   res,
   statusCode = 500,
-  message = "Some error occured!",
+  message = "Something went wrong!",
   ...rest
 }) => {
   res.status(statusCode).json({
