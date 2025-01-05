@@ -13,7 +13,6 @@ export const handleImageUpload = async (req, res) => {
       data: result,
     });
   } catch (e) {
-    console.log("handleImageUpload", e);
     errorResposne({
       res,
       message: "Error occured while image upload!",

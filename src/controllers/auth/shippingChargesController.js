@@ -5,7 +5,6 @@ import ShippingCharges from "../../models/ShippingCharges.js";
 export const setShippingCharges = async (req, res) => {
   try {
     const { charges } = req.body;
-    console.log("charges", charges);
 
     if (!charges || (charges && charges?.length == 0)) {
       return errorResposne({

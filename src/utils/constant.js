@@ -1,6 +1,16 @@
 export const constantMap = {
   INPROGRESS: "IN PROGRESS",
   INSHIPPING: "IN SHIPPING",
+  mudgar: "Mudgar",
+  gada: "Gada",
+  pushUpBoard: "Push Up Board",
+  samtola: "Samtola",
+  comboKit: "Combo Kit",
+  babool: "Babool (Acacia)",
+  sagwan: "Sagwan (Teak Wood)",
+  woodType: "Wood Type",
+  weight: "Weight",
+  height: "Height",
 };
 
 export const getConstant = (key) => {

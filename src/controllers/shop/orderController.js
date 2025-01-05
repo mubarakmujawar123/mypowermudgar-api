@@ -1,4 +1,5 @@
 import { sendMail } from "../../helpers/emailConfiguration.js";
+import { generateInvoice } from "../../helpers/invoice.js";
 import {
   capturePaymentPaypal,
   createOrderPayPal,
@@ -10,7 +11,17 @@ import User from "../../models/User.js";
 import { currencySymbol } from "../../utils/constant.js";
 import errorResposne from "../../utils/errorResponse.js";
 import successResposne from "../../utils/successResponse.js";
-import { calculateItemPrice, convertPrice } from "../../utils/utils.js";
+import {
+  calculateItemPrice,
+  convertPrice,
+  getAddress,
+  getProductAdditionalInfo,
+} from "../../utils/utils.js";
+import * as fs from "fs";
+
+import path from "path";
+
+const __dirname = path.resolve();
 
 export const createOrder = async (req, res) => {
   try {
@@ -86,8 +97,6 @@ export const createOrder = async (req, res) => {
       totalAmountDetails
     );
 
-    console.log("response order controller", response);
-
     if (response.status === "error") {
       return errorResposne({
         res,
@@ -136,39 +145,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-const getProductAdditionalInfo = (obj) => {
-  let desc = "";
-  if (obj) {
-    for (const key in obj) {
-      if (key === "height") {
-        desc += `<br/>Height : ${obj[key]} (Feet)`;
-      }
-      if (key === "weight") {
-        desc += `<br/>Weight : ${obj[key]} (KG)`;
-      }
-      if (key === "woodType") {
-        desc += `<br/>Wood Type : ${obj[key]}`;
-      }
-    }
-  }
-  return desc;
-};
-const getAddress = (obj) => {
-  let _address;
-  if (obj) {
-    _address = `
-        Phone: ${obj.phone}<br/>
-        Address: ${obj.address}<br/>
-        City: ${obj.city}<br/>
-        Notes: ${obj.notes}<br/>
-        State: ${obj.state}<br/>
-        Country: ${obj.country}<br/>
-        Pincode: ${obj.pincode}<br/>
-      `;
-  }
-  return _address;
-};
-
 export const capturePayment = async (req, res) => {
   try {
     const { paymentId, payerId, orderId } = req.body;
@@ -189,7 +165,10 @@ export const capturePayment = async (req, res) => {
           "Error while confirming your order! Our team will get back to you.",
       });
     }
-    order.paymentStatus = response?.data?.status;
+    order.paymentStatus =
+      response?.data?.status === "CREATED"
+        ? "CONFIRMED"
+        : response?.data?.status;
     order.orderStatus = "CONFIRMED";
     order.paymentId = paymentId;
     order.payerId = payerId;
@@ -310,6 +289,13 @@ export const canclePayment = async (req, res) => {
 export const getAllOrderByUser = async (req, res) => {
   try {
     const { userId } = req.params;
+    if (userId === "undefined" || !userId) {
+      return errorResposne({
+        res,
+        statusCode: 404,
+        message: "User not found!",
+      });
+    }
 
     let orders = await Order.find({ userId })?.sort({ orderDate: -1 });
     if (!orders) {
@@ -350,6 +336,49 @@ export const getOrderDetails = async (req, res) => {
       data: order,
       message: "Order found!",
     });
+  } catch (e) {
+    console.log(e);
+    errorResposne({ res, statusCode: 500, message: "Something went wrong!" });
+  }
+};
+
+export const getInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let order = await Order.findById(id);
+    if (!order) {
+      return errorResposne({
+        res,
+        statusCode: 404,
+        message: "Order not found!",
+      });
+    }
+    let user = await User.findById(order.userId);
+    if (!user) {
+      return errorResposne({
+        res,
+        statusCode: 404,
+        message: "User not found!",
+      });
+    }
+    const { stream, filePath, doc } = await generateInvoice(order, user);
+    stream.on("finish", () => {
+      res.sendFile(filePath, { root: __dirname }, (err) => {
+        if (err) {
+          console.error("Error sending file:", err);
+          res.status(500).send("Could not generate PDF");
+        } else {
+          // Optionally delete the file after sending
+          fs.unlinkSync(filePath);
+        }
+      });
+    });
+    // return successResposne({
+    //   res,
+    //   statusCode: 200,
+    //   data: "./file.pdf",
+    //   message: "Order found!",
+    // });
   } catch (e) {
     console.log(e);
     errorResposne({ res, statusCode: 500, message: "Something went wrong!" });

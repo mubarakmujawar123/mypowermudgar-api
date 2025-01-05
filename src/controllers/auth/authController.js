@@ -4,14 +4,7 @@ import User from "../../models/User.js";
 import successResposne from "../../utils/successResponse.js";
 import errorResposne from "../../utils/errorResponse.js";
 import { sendMail } from "../../helpers/emailConfiguration.js";
-const minNumber = 100000;
-const maxNumber = 999999;
-
-const generateOTP = () => {
-  // return Math.floor(1000 + Math.random() * 900000).toString(); // 6 digit otp
-
-  return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber; // 6 digit otp
-};
+import { generateOTP } from "../../utils/utils.js";
 
 export const registerUser = async (req, res) => {
   let { userName, email, password } = req.body;

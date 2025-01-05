@@ -5,7 +5,6 @@ import CurrencyRates from "../../models/CurrencyRates.js";
 export const setCurrencyRates = async (req, res) => {
   try {
     const { rates } = req.body;
-    console.log("Rates", rates);
 
     if (!rates) {
       return errorResposne({

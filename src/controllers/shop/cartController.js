@@ -69,7 +69,7 @@ export const addToCart = async (req, res) => {
 export const fetchCartItems = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("userId", userId);
+    "userId", userId;
     if (!userId) {
       return errorResposne({
         res,

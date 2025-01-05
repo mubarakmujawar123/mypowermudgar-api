@@ -15,7 +15,6 @@ export const addAddress = async (req, res) => {
       notes,
       // isDefault,
     } = req.body;
-    console.log(req.body);
     if (
       !userId ||
       !address ||
@@ -90,7 +89,6 @@ export const updateAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
     const formData = req.body;
-    console.log("userId", userId, addressId, formData);
     if (!userId || !addressId) {
       return errorResposne({
         res,
