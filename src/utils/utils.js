@@ -3,9 +3,14 @@ import { getConstant } from "./constant.js";
 export const calculateItemPrice = (
   basePrice,
   quantity,
-  productAdditionalInfo
+  productAdditionalInfo,
+  isForInvoice = false,
+  orderInCurrencyRate = 1
 ) => {
-  let finalPrice = Number(basePrice) * Number(quantity);
+  let finalPrice = isForInvoice
+    ? Number(basePrice) * Number(orderInCurrencyRate)
+    : Number(basePrice);
+  finalPrice = finalPrice * Number(quantity);
 
   let productWeight = productAdditionalInfo?.weight;
   if (productWeight) {

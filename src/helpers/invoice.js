@@ -2,10 +2,9 @@ import PDFDocument from "pdfkit";
 import * as fs from "fs";
 
 import {
+  calculateItemPrice,
   convertPrice,
   formatDateISO,
-  generateOTP,
-  getProductAdditionalInfo,
   getProductAdditionalInfoForInvoice,
 } from "../utils/utils.js";
 import { currencySymbol, getConstant } from "../utils/constant.js";
@@ -62,8 +61,12 @@ export const generateInvoice = async (order, user) => {
       category: getConstant(cartItem.category),
       description: cartItem.productAdditionalInfo,
       quantity: cartItem.quantity,
-      price: `${currencySymbol[order.orderInCurrency]} ${convertPrice(
+
+      price: `${currencySymbol[order.orderInCurrency]}${calculateItemPrice(
         cartItem.price,
+        cartItem.quantity,
+        cartItem.productAdditionalInfo,
+        true,
         order.orderInCurrencyRate
       )}`,
     })),
@@ -187,6 +190,7 @@ export const generateInvoice = async (order, user) => {
     const item = invoiceDetails.items[i];
     const position = doc.y;
     // const position = doc.y + 10;
+
     generateTableRow(
       doc,
       position,
@@ -209,7 +213,7 @@ export const generateInvoice = async (order, user) => {
   doc.text(
     `${
       currencySymbol[invoiceDetails.orderInCurrency]
-    } ${invoiceDetails.totalCartPriceWithPreferredCurrency.toFixed(2)}`,
+    }${invoiceDetails.totalCartPriceWithPreferredCurrency.toFixed(2)}`,
     480,
     doc.y
   );
@@ -217,7 +221,7 @@ export const generateInvoice = async (order, user) => {
   doc.text("Shipping Charges", 350, doc.y);
   doc.moveUp();
   doc.text(
-    `${currencySymbol[invoiceDetails.orderInCurrency]} ${Number(
+    `${currencySymbol[invoiceDetails.orderInCurrency]}${Number(
       convertPrice(
         invoiceDetails.shippingCost,
         invoiceDetails.orderInCurrencyRate
@@ -230,7 +234,7 @@ export const generateInvoice = async (order, user) => {
   doc.text("Total Order Amount", 350, doc.y);
   doc.moveUp();
   doc.text(
-    `${currencySymbol[invoiceDetails.orderInCurrency]} ${Number(
+    `${currencySymbol[invoiceDetails.orderInCurrency]}${Number(
       invoiceDetails.totalCartPriceWithPreferredCurrency +
         Number(
           convertPrice(
@@ -247,13 +251,13 @@ export const generateInvoice = async (order, user) => {
   doc.text("Note:", 50, doc.y);
   doc.moveDown();
   doc.text(
-    "*:Order Price is based on product base price, product quantity, product weight ect.",
+    "*Order Price is based on product base price, product quantity, product weight etc.",
     50,
     doc.y
   );
   doc.moveDown();
   doc.text(
-    "This is system generated invoice. Signature does not required.",
+    "This is system generated Invoice. Does not required signature.",
     50,
     doc.y
   );
